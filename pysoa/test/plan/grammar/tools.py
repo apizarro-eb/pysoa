@@ -123,11 +123,15 @@ def get_all_paths(data, current_path=''):
     # type: (Union[Mapping, List, Tuple, AbstractSet], six.text_type) -> List[six.text_type]
     paths = []
     if isinstance(data, Mapping):
+        if current_path and not data:
+            return [current_path]  # explicit path to empty mapping
         for k, v in six.iteritems(data):
             if isinstance(k, six.string_types) and (k.isdigit() or '.' in k):
                 k = '{{{}}}'.format(k)
             paths.extend(get_all_paths(v, _dot_join(current_path, k)))
     elif isinstance(data, (list, tuple, AbstractSet)):  # do not use Sequence, definitely causes infinite recursion
+        if current_path and not data:
+            return [current_path]  # explicit path to empty sequence
         if isinstance(data, AbstractSet):
             data = sorted(list(data))
         for i, v in enumerate(data):
